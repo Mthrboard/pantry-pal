@@ -18,7 +18,7 @@ require("dotenv").config({ path: "./config/.env" })
 require("./config/passport")(passport)
 
 //Connect To Database
-const clientP = connectDB()
+const clientPromise = connectDB()
 
 //Using EJS for views
 app.set("view engine", "ejs")
@@ -42,7 +42,7 @@ app.use(
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ clientPromise: clientP}),
+    store: MongoStore.create({ clientPromise: clientPromise}),
   })
 )
 
