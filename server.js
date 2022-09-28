@@ -9,7 +9,10 @@ const methodOverride = require("method-override")
 const flash = require("express-flash")
 const logger = require("morgan")
 const connectDB = require("./config/database")
-const homeRoutes = require('./routes/home')
+const appSettings = require("./config/settings")
+const homeRoutes = require("./routes/home")
+const profileRoutes = require("./routes/profile")
+const dashboardRoutes = require("./routes/dashboard")
 
 //Use .env file in config folder
 require("dotenv").config({ path: "./config/.env" })
@@ -50,11 +53,14 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.use(appSettings)
 //Use flash messages for errors, info, ect...
 app.use(flash())
 
 //Setup Routes For Which The Server Is Listening
 app.use("/", homeRoutes)
+app.use("/profile", profileRoutes)
+app.use("/dashboard", dashboardRoutes)
 
 //Server Running
 app.listen(process.env.PORT, () => {
