@@ -29,3 +29,22 @@ Similarly, I would like to be able to split items into different storage areas
 by partial quantities. Like if you bought a 50 pound bag of flour, you might
 keep 45 pounds in a large tote in the pantry, but have a smaller 5 pound
 container in the kitchen.
+
+## Installation
+
+If you want to run your own copy, clone the repo locally, then run `npm install`
+
+## Configuration
+
+* Open the `.env.example` file in the config folder, and fill in the missing variables
+  * PORT = 3000 (use any open port on your system)
+  * EXPRESS_SESSION_SECRET = Generate a random value to encrypt session storage
+  * MONGOOSE_DB_STRING = Your MongoDB URI
+  * CLOUDINARY_CLOUD_NAME = Your cloudinary cloud name
+  * CLOUDINARY_API_KEY = Your cloudinary API key
+  * CLOUDINARY_API_SECRET = Your cloudinary API secret
+  * MULTER_ALLOWED_EXTENSIONS = Allowed image extensions (adjust if necessary)
+
+## Run
+
+`npm start`
