@@ -17,5 +17,4 @@
 
 .herosection {
   @apply hero min-h-screen;
-  background-image: url("/images/foodshelf.jpg");
 }

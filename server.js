@@ -1,13 +1,14 @@
 // Import node modules
 const express = require("express")
-const app = express()
-const mongoose = require("mongoose")
 const passport = require("passport")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const methodOverride = require("method-override")
 const flash = require("express-flash")
 const logger = require("morgan")
+const path = require("path")
+const app = express()
+
 const connectDB = require("./config/database")
 const appSettings = require("./config/settings")
 const homeRoutes = require("./routes/home")
@@ -54,8 +55,12 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(appSettings)
+
 //Use flash messages for errors, info, ect...
 app.use(flash())
+
+//Node Modules for Import
+app.use('/scripts', express.static(path.join(__dirname, '/node_modules/flowbite/dist')))
 
 //Setup Routes For Which The Server Is Listening
 app.use("/", homeRoutes)
