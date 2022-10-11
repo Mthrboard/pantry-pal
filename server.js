@@ -1,6 +1,8 @@
 // Import node modules
+require("express-async-errors")
 const express = require("express")
 const passport = require("passport")
+const cors = require("cors")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
 const methodOverride = require("method-override")
@@ -29,6 +31,9 @@ app.set("view engine", "ejs")
 
 //Static Folder
 app.use(express.static("public"))
+
+// CORS Handling
+app.use(cors())
 
 //Body Parsing
 app.use(express.urlencoded({ extended: true }))
@@ -60,7 +65,7 @@ app.use(appSettings)
 app.use(flash())
 
 //Node Modules for Import
-app.use('/scripts', express.static(path.join(__dirname, '/node_modules/flowbite/dist')))
+app.use("/scripts", express.static(path.join(__dirname, "/node_modules/flowbite/dist")))
 
 //Setup Routes For Which The Server Is Listening
 app.use("/", homeRoutes)
@@ -71,3 +76,5 @@ app.use("/dashboard", dashboardRoutes)
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}, you better catch it!`)
 })
+
+module.exports = app;

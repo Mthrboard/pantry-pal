@@ -1,0 +1,11 @@
+<html>
+    <head>
+        <style>
+        </style>
+    </head>
+    <body>
+        <p style="text-transform: capitalize;">Hi <%= content.name %>,</p>
+        <p>Welcome to your new <a href="<%= process.env.CLIENT_URL %>"><span style="text-transform: uppercase; font-weight: bold"><%= process.env.FRIENDLY_APP_NAME %></span></a> account.</p>
+        <p><a href="<%= process.env.CLIENT_URL %>/onboarding">Get Started</a></p>
+    </body>
+</html>

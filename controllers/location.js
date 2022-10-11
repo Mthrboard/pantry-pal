@@ -11,7 +11,7 @@ module.exports = {
         storageLight: req.body.storageLight,
       })
       console.log('Location has been added.')
-      res.redirect('/dashboard')
+      res.redirect('/dashboard', {user: req.user})
     } catch (err) {
       console.error(err)
     }

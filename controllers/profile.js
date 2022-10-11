@@ -1,8 +1,8 @@
 module.exports = {
   getProfile: (req, res) => {
-    res.render("profile.ejs")
+    res.render("profile.ejs", {user: req.user})
   },
   getSettings: (req, res) => {
-    res.render("settings.ejs")
+    res.render("settings.ejs", {user: req.user})
   }
 }
