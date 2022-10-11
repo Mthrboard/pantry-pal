@@ -1,3 +1,5 @@
+const Location = require("../models/Location")
+
 module.exports = {
   addLocation: async (req, res) => {
     try {

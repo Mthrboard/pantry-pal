@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const ItemSchema = new mongoose.Schema({
-  itemName: { type: String, unique: true, required: true},
+  itemName: { type: String, required: true},
+  generic: { type: mongoose.Schema.Types.ObjectId, ref: "Generic", default: null },
   description: { type: String },
   barcode: { type: String },
   dateType: { type: String },
@@ -11,6 +12,7 @@ const ItemSchema = new mongoose.Schema({
   storageTemp: { type: String, enum: Array.from(process.env.MONGOOSE_STORAGE_TEMP_ENUM) },
   storageLight: { type: String, enum: Array.from(process.env.MONGOOSE_STORAGE_LIGHT_ENUM) },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  public: { type: Boolean, default: false },
   image: { type: String },
   cloudinaryId: { type: String },
   dateCreated: { type: Date, default: Date.now },
