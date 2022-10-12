@@ -44,6 +44,15 @@ If you want to run your own copy, clone the repo locally, then run `npm install`
   * CLOUDINARY_API_KEY = Your cloudinary API key
   * CLOUDINARY_API_SECRET = Your cloudinary API secret
   * MULTER_ALLOWED_EXTENSIONS = Allowed image extensions (adjust if necessary)
+  * FRIENDLY_APP_NAME = The name of the app, used in templates
+  * BCRYPT_SALT_ROUNDS = How much time bcrypt will take to calculate salt
+  * JWT_SECRET = Generate a random 32-character alphanumeric key
+  * CLIENT_URL = The final URL where this app will be hosted (ex. http://localhost for development)
+  * EMAIL_FROM = The email address messages sent from this application will come from
+  * EMAIL_HOST = SMTP server used for sending emails to users
+  * EMAIL_PORT = Port of the SMTP server above
+  * EMAIL_USERNAME = Username for the email account from which you send messages
+  * EMAIL_PASSWORD = Password for the email account from which you send messages
 
 ## Run
 
