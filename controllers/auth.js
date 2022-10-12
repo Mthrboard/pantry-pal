@@ -1,7 +1,8 @@
 const passport = require("passport")
 const validator = require("validator")
 const User = require("../models/User")
-const Token = require("../models/Token")
+const ResetToken = require("../models/ResetToken")
+const ValidationToken = require("../models/ValidationToken")
 const { sendEmail } = require("../utils/sendEmail")
 const bcrypt = require("bcrypt")
 const crypto = require("node:crypto")
@@ -64,7 +65,7 @@ module.exports = {
     }
     res.render("signup")
   },
-  postSignup: (req, res, next) => {
+  postSignup: async (req, res, next) => {
     const validationErrors = []
     if (!validator.isEmail(req.body.email))
       validationErrors.push({ msg: "Please enter a valid email address." })
@@ -102,11 +103,20 @@ module.exports = {
           if (err) {
             return next(err)
           }
-          req.logIn(user, (err) => {
+          req.logIn(user, async (err) => {
             if (err) {
               return next(err)
             }
-            sendEmail(user.email, `Welcome to ${process.env.FRIENDLY_APP_NAME}`, {name: user.name }, "welcome.ejs")
+            let validationToken = crypto.randomBytes(32).toString("hex")
+            const hash = await bcrypt.hash(validationToken, Number(process.env.BCRYPT_SALT_ROUNDS))
+            await new ValidationToken({
+              userId: user._id,
+              token: hash,
+              expireAt: Date.now(),
+            }).save()
+            const validationUrl = `${process.env.CLIENT_URL}:${process.env.PORT}/account/validateEmail/${user._id}/${validationToken}`
+            if (process.env.NODE_ENV === 'development') console.log(`Validation URL: ${validationUrl}`)
+            sendEmail(user.email, `Welcome to ${process.env.FRIENDLY_APP_NAME}`, {user: user, validationUrl: validationUrl }, "welcome.ejs")
             res.redirect("/onboarding")
           })
         })
@@ -121,18 +131,19 @@ module.exports = {
       const user = await User.findOne({ email: req.body.email })
 
       if (!user) throw new Error("User does not exist")
-      let token = await Token.findOne({ userId: user._id })
+      let token = await ResetToken.findOne({ userId: user._id })
       if (token) await token.deleteOne()
       let resetToken = crypto.randomBytes(32).toString("hex")
       const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT_ROUNDS))
 
-      await new Token({
+      await new ResetToken({
         userId: user._id,
         token: hash,
-        createdAt: Date.now(),
+        expireAt: Date.now(),
       }).save()
 
-      const resetUrl = `${process.env.CLIENT_URL}/resetpassword/${resetToken}/${user._id}`
+      const resetUrl = `${process.env.CLIENT_URL}:${process.env.PORT}/resetpassword/${user._id}/${resetToken}`
+      if (process.env.NODE_ENV === 'development') console.log(`Reset URL: ${resetUrl}`)
       sendEmail(user.email, "Password Reset Request", {name: user.name, resetUrl: resetUrl}, "requestResetPassword.ejs")
       res.redirect("/")
     } catch (err) {
@@ -144,7 +155,7 @@ module.exports = {
     try {
       const user = await User.findOne({ _id: req.params.userId })
       if (!user) throw new Error("User does not exist")
-      const token = await Token.findOne({ userId: req.params.userId })
+      const token = await ResetToken.findOne({ userId: req.params.userId })
       if (!token) throw new Error("Password reset token does not exist")
       const isValidToken = await bcrypt.compare(req.params.token, token.token)
       if (!isValidToken) throw new Error("Invalid reset token")
@@ -156,7 +167,7 @@ module.exports = {
   },
   postResetPassword: async (req, res) => {
     try {
-      const token = await Token.findOne({ userId: req.body.userId })
+      const token = await ResetToken.findOne({ userId: req.body.userId })
       if (!token) throw new Error("Password reset token does not exist")
       const isValidToken = await bcrypt.compare(req.body.token, token.token)
       if (!isValidToken) throw new Error("Invalid reset token")

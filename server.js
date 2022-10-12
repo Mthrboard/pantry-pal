@@ -16,6 +16,7 @@ const appSettings = require("./config/settings")
 const homeRoutes = require("./routes/home")
 const profileRoutes = require("./routes/profile")
 const dashboardRoutes = require("./routes/dashboard")
+const accountRoutes = require("./routes/account")
 
 //Use .env file in config folder
 require("dotenv").config({ path: "./config/.env" })
@@ -71,6 +72,7 @@ app.use("/scripts", express.static(path.join(__dirname, "/node_modules/flowbite/
 app.use("/", homeRoutes)
 app.use("/profile", profileRoutes)
 app.use("/dashboard", dashboardRoutes)
+app.use("/account", accountRoutes)
 
 //Server Running
 app.listen(process.env.PORT, () => {

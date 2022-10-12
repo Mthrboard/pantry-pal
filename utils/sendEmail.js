@@ -24,11 +24,11 @@ module.exports = {
             html: data
           }
 
-          transport.sendMail(mailOptions, (err, info) => {
-            if (err) {
-              return console.error(err)
-            }
-          })
+          if (process.env.NODE_ENV === 'production') {
+            transport.sendMail(mailOptions, (err, info) => {
+              if (err) return console.error(err)
+            })
+          }
         }
       })
     } catch (err) {
