@@ -24,14 +24,11 @@ module.exports = {
             html: data
           }
 
-          console.log(`Email generated`)
-          //console.log(mailOptions)
-          // transport.sendMail(mailOptions, (err, info) => {
-          //   if (err) {
-          //     return console.error(err)
-          //   }
-          //   console.log(`Message sent: ${info.messageId}`)
-          // })
+          transport.sendMail(mailOptions, (err, info) => {
+            if (err) {
+              return console.error(err)
+            }
+          })
         }
       })
     } catch (err) {

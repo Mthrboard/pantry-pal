@@ -12,7 +12,6 @@ module.exports = {
         itemLot: req.body.itemLot,
         unitCost: req.body.unitCost,
       })
-      console.log('ItemLocation has been added.')
       res.redirect('/dashboard', {user: req.user})
     } catch (err) {
       console.error(err)

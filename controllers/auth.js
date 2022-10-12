@@ -9,7 +9,6 @@ const crypto = require("node:crypto")
 module.exports = {
   getLogin: (req, res) => {
     if (req.user) {
-      console.log(req.body)
       return res.redirect("/dashboard")
     }
     res.render("login")
@@ -49,10 +48,8 @@ module.exports = {
       req.session.destroy((err) => {
         if (err)
           console.error("Error : Failed to destroy the session during logout.", err)
-        console.log("Session Destroyed")
       })
       req.logout(() => {
-        console.log('User has logged out.')
         req.user = null
         res.redirect("/")
       })
@@ -136,7 +133,6 @@ module.exports = {
       }).save()
 
       const resetUrl = `${process.env.CLIENT_URL}/resetpassword/${resetToken}/${user._id}`
-      console.log(`Reset URL: ${resetUrl}`)
       sendEmail(user.email, "Password Reset Request", {name: user.name, resetUrl: resetUrl}, "requestResetPassword.ejs")
       res.redirect("/")
     } catch (err) {
@@ -167,8 +163,7 @@ module.exports = {
       const user = await User.findById({ _id: req.body.userId })
       await user.updateOne({ password: req.body.password })
       sendEmail(user.email, "Password Reset Successfully", {name: user.name } , "resetPassword.ejs")
-      console.log(`Password Reset`)
-      //await token.deleteOne()
+      await token.deleteOne()
       res.redirect("/")
     } catch (err) {
       console.error(err)

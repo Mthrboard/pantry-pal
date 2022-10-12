@@ -10,7 +10,6 @@ module.exports = {
         storageTemp: req.body.storageTemp,
         storageLight: req.body.storageLight,
       })
-      console.log('Location has been added.')
       res.redirect('/dashboard', {user: req.user})
     } catch (err) {
       console.error(err)

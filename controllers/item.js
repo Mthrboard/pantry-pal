@@ -19,7 +19,6 @@ module.exports = {
         image: result.secure_url,
         cloudinaryId: result.public_id
       })
-      console.log("Item has been added.")
       res.redirect("/dashboard", {user: req.user})
     } catch (err) {
       console.error(err)
