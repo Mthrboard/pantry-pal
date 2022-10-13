@@ -1,0 +1,10 @@
+<html>
+    <head>
+        <style>
+        </style>
+    </head>
+    <body>
+        <p style="text-transform: capitalize;">Hi <%= content.name %>,</p>
+        <p>Thank you for verifying your email address. Your <a href="<%= process.env.CLIENT_URL %>"><span style="text-transform: uppercase; font-weight: bold"><%= process.env.FRIENDLY_APP_NAME %></span></a> account is now completely active</p>
+    </body>
+</html>
