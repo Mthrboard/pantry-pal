@@ -60,6 +60,7 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+// AppSettings middleware to set up locals
 app.use(appSettings)
 
 //Use flash messages for errors, info, ect...
