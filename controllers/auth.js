@@ -1,8 +1,7 @@
 const passport = require("passport")
 const validator = require("validator")
 const User = require("../models/User")
-const ResetToken = require("../models/ResetToken")
-const ValidationToken = require("../models/ValidationToken")
+const Token = require("../models/Token")
 const { sendEmail } = require("../utils/sendEmail")
 const bcrypt = require("bcrypt")
 const crypto = require("node:crypto")
@@ -15,13 +14,13 @@ module.exports = {
     res.render("login")
   },
   postLogin: (req, res, next) => {
-    const validationErrors = []
+    const verificationErrors = []
     if (!validator.isEmail(req.body.email))
-      validationErrors.push({ msg: "Please enter a valid email address." })
+      verificationErrors.push({ msg: "Please enter a valid email address." })
     if (validator.isEmpty(req.body.password))
-      validationErrors.push({ msg: "Password cannot be blank." })
-    if (validationErrors.length) {
-      req.flash("errors", validationErrors)
+      verificationErrors.push({ msg: "Password cannot be blank." })
+    if (verificationErrors.length) {
+      req.flash("errors", verificationErrors)
       return res.redirect("/login")
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
@@ -66,17 +65,17 @@ module.exports = {
     res.render("signup")
   },
   postSignup: async (req, res, next) => {
-    const validationErrors = []
+    const verificationErrors = []
     if (!validator.isEmail(req.body.email))
-      validationErrors.push({ msg: "Please enter a valid email address." })
+      verificationErrors.push({ msg: "Please enter a valid email address." })
     if (!validator.isLength(req.body.password, { min: 8 }))
-      validationErrors.push({
+      verificationErrors.push({
         msg: "Password must be at least 8 characters long",
       })
     if (req.body.password !== req.body.confirmPassword)
-      validationErrors.push({ msg: "Passwords do not match" })
-    if (validationErrors.length) {
-      req.flash("errors", validationErrors)
+      verificationErrors.push({ msg: "Passwords do not match" })
+    if (verificationErrors.length) {
+      req.flash("errors", verificationErrors)
       return res.redirect("/signup")
     }
     req.body.email = validator.normalizeEmail(req.body.email, {
@@ -107,16 +106,17 @@ module.exports = {
             if (err) {
               return next(err)
             }
-            let validationToken = crypto.randomBytes(32).toString("hex")
-            const hash = await bcrypt.hash(validationToken, Number(process.env.BCRYPT_SALT_ROUNDS))
-            await new ValidationToken({
+            let verificationToken = crypto.randomBytes(32).toString("hex")
+            const hash = await bcrypt.hash(verificationToken, Number(process.env.BCRYPT_SALT_ROUNDS))
+            await new Token({
               userId: user._id,
               token: hash,
-              expireAt: Date.now(),
+              type: 'emailVerification',
+              expireAt: new Date(new Date().valueOf() + process.env.EMAIL_VERIFICATION_TOKEN_SECONDS * 1000),
             }).save()
-            const validationUrl = `${process.env.CLIENT_URL}:${process.env.PORT}/account/validateEmail/${user._id}/${validationToken}`
-            if (process.env.NODE_ENV === 'development') console.log(`Validation URL: ${validationUrl}`)
-            sendEmail(user.email, `Welcome to ${process.env.FRIENDLY_APP_NAME}`, {user: user, validationUrl: validationUrl }, "welcome.ejs")
+            const verificationUrl = `${process.env.CLIENT_URL}:${process.env.PORT}/account/verifyEmail/${user._id}/${verificationToken}`
+            if (process.env.NODE_ENV === 'development') console.log(`Verification URL: ${verificationUrl}`)
+            sendEmail(user.email, `Welcome to ${process.env.FRIENDLY_APP_NAME}`, {user: user, verificationUrl: verificationUrl }, "welcome.ejs")
             res.redirect("/onboarding")
           })
         })
@@ -131,15 +131,16 @@ module.exports = {
       const user = await User.findOne({ email: req.body.email })
 
       if (!user) throw new Error("User does not exist")
-      let token = await ResetToken.findOne({ userId: user._id })
+      let token = await Token.findOne({ userId: user._id, type: 'passwordReset' })
       if (token) await token.deleteOne()
       let resetToken = crypto.randomBytes(32).toString("hex")
       const hash = await bcrypt.hash(resetToken, Number(process.env.BCRYPT_SALT_ROUNDS))
 
-      await new ResetToken({
+      await new Token({
         userId: user._id,
         token: hash,
-        expireAt: Date.now(),
+        type: 'passwordReset',
+        expireAt: new Date(new Date().valueOf() + process.env.PASSWORD_RESET_TOKEN_SECONDS * 1000)
       }).save()
 
       const resetUrl = `${process.env.CLIENT_URL}:${process.env.PORT}/resetpassword/${user._id}/${resetToken}`
@@ -155,7 +156,7 @@ module.exports = {
     try {
       const user = await User.findOne({ _id: req.params.userId })
       if (!user) throw new Error("User does not exist")
-      const token = await ResetToken.findOne({ userId: req.params.userId })
+      const token = await Token.findOne({ userId: req.params.userId, type: 'passwordReset' })
       if (!token) throw new Error("Password reset token does not exist")
       const isValidToken = await bcrypt.compare(req.params.token, token.token)
       if (!isValidToken) throw new Error("Invalid reset token")
@@ -167,7 +168,7 @@ module.exports = {
   },
   postResetPassword: async (req, res) => {
     try {
-      const token = await ResetToken.findOne({ userId: req.body.userId })
+      const token = await Token.findOne({ userId: req.body.userId, type: 'passwordReset' })
       if (!token) throw new Error("Password reset token does not exist")
       const isValidToken = await bcrypt.compare(req.body.token, token.token)
       if (!isValidToken) throw new Error("Invalid reset token")
