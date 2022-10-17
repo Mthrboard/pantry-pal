@@ -11,39 +11,43 @@ const logger = require("morgan")
 const path = require("path")
 const app = express()
 
+// Use .env file in config folder
+require("dotenv").config({ path: "./config/.env" })
+
+// Configuration
 const connectDB = require("./config/database")
 const appSettings = require("./config/settings")
+
+// Routers
 const homeRoutes = require("./routes/home")
 const profileRoutes = require("./routes/profile")
 const dashboardRoutes = require("./routes/dashboard")
 const accountRoutes = require("./routes/account")
-
-//Use .env file in config folder
-require("dotenv").config({ path: "./config/.env" })
+const locationsRoutes = require("./routes/locations")
 
 // Passport config
 require("./config/passport")(passport)
 
-//Connect To Database
+// Connect To Database
 const clientPromise = connectDB()
 
-//Using EJS for views
+// Using EJS for views
 app.set("view engine", "ejs")
 
-//Static Folder
+// Static Folder
 app.use(express.static("public"))
 
 // CORS Handling
 app.use(cors())
 
-//Body Parsing
+// Body Parsing
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-//Logging
+// Logging
 app.use(logger("dev"))
 
-//Use forms for put / delete
+// Use forms for put / delete
 app.use(methodOverride("_method"))
 
 // Setup Sessions - stored in MongoDB
@@ -63,19 +67,20 @@ app.use(passport.session())
 // AppSettings middleware to set up locals
 app.use(appSettings)
 
-//Use flash messages for errors, info, ect...
+// Use flash messages for errors, info, ect...
 app.use(flash())
 
-//Node Modules for Import
+// Node Modules for Import
 app.use("/scripts", express.static(path.join(__dirname, "/node_modules/flowbite/dist")))
 
-//Setup Routes For Which The Server Is Listening
+// Setup Routes For Which The Server Is Listening
 app.use("/", homeRoutes)
 app.use("/profile", profileRoutes)
 app.use("/dashboard", dashboardRoutes)
 app.use("/account", accountRoutes)
+app.use("/locations", locationsRoutes)
 
-//Server Running
+// Server Running
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}, you better catch it!`)
 })

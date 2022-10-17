@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const LocationSchema = new mongoose.Schema({
-  locationName: { type: String, unique: true, required: true},
+  locationName: { type: String, required: true },
   description: { type: String, required: true },
   parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Location", default: null },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
