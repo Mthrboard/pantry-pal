@@ -24,6 +24,7 @@ const profileRoutes = require("./routes/profile")
 const dashboardRoutes = require("./routes/dashboard")
 const accountRoutes = require("./routes/account")
 const locationsRoutes = require("./routes/locations")
+const itemLocationsRoutes = require("./routes/itemLocations")
 
 // Passport config
 require("./config/passport")(passport)
@@ -79,6 +80,7 @@ app.use("/profile", profileRoutes)
 app.use("/dashboard", dashboardRoutes)
 app.use("/account", accountRoutes)
 app.use("/locations", locationsRoutes)
+app.use("/itemLocations", itemLocationsRoutes)
 
 // Server Running
 app.listen(process.env.PORT, () => {
